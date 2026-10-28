@@ -1,15 +1,58 @@
-<ion-header [translucent]="true">
+
+<ion-header>
   <ion-toolbar>
-    <ion-title> Tab 3 </ion-title>
+    <ion-title>Mis seguimientos</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+  <div *ngIf="cargando" class="ion-text-center">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando seguimientos...</p>
+  </div>
+
+  <ion-text color="danger" *ngIf="error">
+    <p>{{ error }}</p>
+  </ion-text>
+
+  <div *ngIf="!cargando && !error && incidencias.length === 0"
+       class="ion-text-center">
+    <h2>No tienes seguimientos</h2>
+    <p>Marca una incidencia en la lista para verla aquí.</p>
+  </div>
+
+  <ion-list *ngIf="!cargando && incidencias.length > 0">
+    <ion-item *ngFor="let incidencia of incidencias">
+      <ion-label class="ion-text-wrap">
+        <h2>{{ incidencia.codigo }} - {{ incidencia.tipo }}</h2>
+        <p>{{ incidencia.descripcion }}</p>
+        <p>Dirección: {{ incidencia.direccion }}</p>
+        <p>Sector: {{ incidencia.sector }}</p>
+        <p>Fecha: {{ incidencia.fecha }}</p>
+
+        <ion-badge [color]="obtenerColor(incidencia.estado)">
+          {{ incidencia.estado }}
+        </ion-badge>
+      </ion-label>
+
+      <ion-button
+        slot="end"
+        size="small"
+        fill="outline"
+        color="danger"
+        (click)="quitarSeguimiento(incidencia.id!)">
+        Quitar
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-button
+    expand="block"
+    fill="outline"
+    *ngIf="!cargando"
+    (click)="cargarSeguimientos()">
+    Actualizar lista
+  </ion-button>
+
 </ion-content>

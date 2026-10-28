@@ -1,15 +1,223 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title> Tab 2 </ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Registrar incidencia</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <!-- Opciones para recuperar un borrador -->
+  <div *ngIf="mostrarOpcionesBorrador" class="aviso-borrador">
+    <h2>Hay un registro sin terminar</h2>
+    <p>Encontramos un borrador guardado. ¿Qué deseas hacer?</p>
+
+    <ion-button expand="block" (click)="continuarBorrador()">
+      Continuar registro
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      color="medium"
+      (click)="descartarBorrador()">
+      Descartar borrador
+    </ion-button>
+  </div>
+
+  <!-- Encabezado -->
+  <section class="encabezado">
+    <h1>Nueva incidencia</h1>
+    <p>Registra un problema de infraestructura urbana.</p>
+  </section>
+
+  <!-- Tipo de incidencia -->
+  <ion-item>
+    <ion-select
+      label="Tipo de incidencia *"
+      labelPlacement="stacked"
+      placeholder="Selecciona el tipo"
+      [(ngModel)]="tipo"
+      (ngModelChange)="guardarBorrador()">
+
+      <ion-select-option value="Bache">Bache</ion-select-option>
+      <ion-select-option value="Luminaria">Luminaria dañada</ion-select-option>
+      <ion-select-option value="Senalizacion">Señalización</ion-select-option>
+      <ion-select-option value="Alcantarilla">Alcantarilla</ion-select-option>
+      <ion-select-option value="Parque">Daño en parque</ion-select-option>
+
+    </ion-select>
+  </ion-item>
+
+  <!-- Descripción -->
+  <ion-item>
+    <ion-textarea
+      label="Descripción *"
+      labelPlacement="stacked"
+      placeholder="Describe el problema encontrado"
+      [autoGrow]="true"
+      [(ngModel)]="descripcion"
+      (ngModelChange)="guardarBorrador()">
+    </ion-textarea>
+  </ion-item>
+
+  <!-- Dirección -->
+  <ion-item>
+    <ion-input
+      label="Dirección *"
+      labelPlacement="stacked"
+      placeholder="Ej. Av. Amazonas y Naciones Unidas"
+      [(ngModel)]="direccion"
+      (ngModelChange)="guardarBorrador()">
+    </ion-input>
+  </ion-item>
+
+  <!-- Sector -->
+  <ion-item>
+    <ion-input
+      label="Sector *"
+      labelPlacement="stacked"
+      placeholder="Ej. Iñaquito"
+      [(ngModel)]="sector"
+      (ngModelChange)="guardarBorrador()">
+    </ion-input>
+  </ion-item>
+
+  <!-- Prioridad -->
+  <ion-item>
+    <ion-select
+      label="Prioridad *"
+      labelPlacement="stacked"
+      placeholder="Selecciona la prioridad"
+      [(ngModel)]="prioridad"
+      (ngModelChange)="guardarBorrador()">
+
+      <ion-select-option value="Baja">Baja</ion-select-option>
+      <ion-select-option value="Media">Media</ion-select-option>
+      <ion-select-option value="Alta">Alta</ion-select-option>
+
+    </ion-select>
+  </ion-item>
+
+  <!-- Fotografía -->
+  <ion-item>
+    <ion-label>Fotografía de la incidencia</ion-label>
+
+    <ion-button slot="end" (click)="tomarFotografia()">
+      {{ fotografia ? 'Tomar otra' : 'Tomar foto' }}
+    </ion-button>
+  </ion-item>
+
+  <!-- Vista previa de la fotografía -->
+  <div *ngIf="fotografia" class="vista-fotografia">
+    <img
+      [src]="fotografia"
+      alt="Fotografía de la incidencia" />
+
+    <ion-button
+      color="medium"
+      fill="outline"
+      (click)="fotografia = ''; guardarBorrador()">
+      Quitar fotografía
+    </ion-button>
+  </div>
+
+  <!-- Ubicación -->
+  <ion-item>
+    <ion-label>
+      <h2>Ubicación</h2>
+
+      <p *ngIf="latitud !== null && longitud !== null">
+        Latitud: {{ latitud }} · Longitud: {{ longitud }}
+      </p>
+
+      <p *ngIf="latitud === null || longitud === null">
+        Ubicación no registrada
+      </p>
+    </ion-label>
+  </ion-item>
+
+  <!-- Obtener ubicación GPS -->
+  <ion-button expand="block" (click)="obtenerUbicacion()">
+    Obtener ubicación GPS
+  </ion-button>
+
+  <!-- Ingresar coordenadas manualmente -->
+  <ion-button
+    expand="block"
+    fill="outline"
+    (click)="ingresarUbicacionManual()">
+    Ingresar coordenadas manualmente
+  </ion-button>
+
+  <p class="nota">* Campos obligatorios.</p>
+
+  <!-- Botón principal de registro -->
+  <ion-button
+    expand="block"
+    class="boton-registrar"
+    [disabled]="guardando || esperandoConfirmacionClima"
+    (click)="registrarIncidencia()">
+
+    {{ guardando ? 'Registrando...' : 'Registrar incidencia' }}
+
+  </ion-button>
+
+  <!-- Mensaje de éxito o error -->
+  <ion-text *ngIf="mensaje" [color]="error ? 'danger' : 'success'">
+    <p class="mensaje">{{ mensaje }}</p>
+  </ion-text>
+
+  <!-- Información meteorológica -->
+  <div *ngIf="temperatura !== null" class="informacion-clima">
+    <h3>Condiciones meteorológicas</h3>
+
+    <p>
+      <strong>Incidencia:</strong> {{ tipoClima }}
+    </p>
+
+    <p>
+      <strong>Dirección:</strong> {{ direccionClima }}
+    </p>
+
+    <p>
+      <strong>Temperatura:</strong> {{ temperatura }} °C
+    </p>
+
+    <p>
+      <strong>Precipitación:</strong> {{ precipitacion }} mm
+    </p>
+
+    <p>
+      <strong>Condición:</strong> {{ condicionClima }}
+    </p>
+  </div>
+
+  <!-- Advertencia meteorológica -->
+  <ion-text color="warning" *ngIf="advertenciaClima">
+    <p>{{ advertenciaClima }}</p>
+  </ion-text>
+
+  <!-- Confirmar o cancelar el registro -->
+  <div
+    *ngIf="esperandoConfirmacionClima"
+    class="confirmacion-clima">
+
+    <p>Revisa la información meteorológica antes de continuar.</p>
+
+    <ion-button
+      expand="block"
+      (click)="confirmarRegistro()">
+      Confirmar y guardar incidencia
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      color="medium"
+      (click)="cancelarConfirmacionClima()">
+      Cancelar
+    </ion-button>
+
+  </div>
+
 </ion-content>

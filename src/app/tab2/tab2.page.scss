@@ -1,0 +1,61 @@
+ion-content {
+  /* fondo del sistema por defecto, pero mantiene tu tono como respaldo */
+  --background: var(--ion-background-color, #f5f3fa);
+}
+
+.encabezado {
+  padding: 12px 8px 18px;
+
+  h1 {
+    color: var(--ion-color-primary, #5b3b8c);
+    font-size: 24px; 
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin-top: 0;
+  }
+}
+
+ion-item {
+  --background: var(--ion-card-background, #ffffff); /* Soporte para modo oscuro */
+  --border-radius: 12px;
+  --inner-padding-end: 12px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Añadida la sombra del segundo bloque */
+  overflow: hidden;
+}
+
+.nota {
+  color: var(--ion-color-medium); 
+  font-size: 13px;
+  margin: 16px 4px;
+}
+
+.boton-registrar {
+  margin-top: 20px;
+  --border-radius: 12px;
+  min-height: 48px;
+}
+
+.mensaje {
+  text-align: center;
+  margin-top: 16px;
+  color: var(--ion-color-medium);
+}
+
+.vista-fotografia {
+  padding: 16px;
+
+  img {
+    display: block;
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+}
